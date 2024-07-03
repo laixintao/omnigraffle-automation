@@ -1,0 +1,146 @@
+/*{
+  "type": "action",
+  "targets": ["omnigraffle"],
+  "author": "laixintao",
+  "identifier": "com.omni-automation.omnigraffle.full-connect",
+  "version": "1.0",
+  "description": "Create lines from objects of one name to another name",
+  "label": "a--b Full Connect",
+  "shortLabel": "Full Connect",
+  "paletteLabel": "Full Connect",
+  "image": "info.square.fill"
+}*/
+
+(() => {
+  const action = new PlugIn.Action(async function (selection, sender) {
+    inputForm = new Form()
+    connectFromInput = new Form.Field.String("connectFrom", "From Object with name", null)
+    connectToInput = new Form.Field.String("connectTo", "To Object with name", null)
+
+    headTypeInput = new Form.Field.Option(
+      "headType",
+      "Head Type",
+      [
+        "FilledArrow",
+        "Arrow",
+        "FilledBall",
+        "Ball",
+        "FilledDoubleArrow",
+        "DoubleArrow",
+        "FilledBox",
+        "Box",
+        "FilledDiamond",
+        "Diamond",
+        "Fork",
+        "StickArrow",
+        "HalfStickArrow",
+        "DoubleStickArrow",
+        "Bar",
+        "UMLInheritance",
+        "SharpArrow",
+        "SharpBackArrow",
+        "SharpBackCross",
+        "CrowsFeet",
+        "CrowBar",
+        "CrowBall",
+        "BarBall",
+        "DoubleBar",
+        "NegativeControls",
+        "DimensionArrow",
+        "EmptyCenterBall",
+        "FilledCenterBall",
+        "UML2Socket",
+        "NonNavigable",
+      ],
+
+      [
+        "FilledArrow",
+        "Arrow",
+        "FilledBall",
+        "Ball",
+        "FilledDoubleArrow",
+        "DoubleArrow",
+        "FilledBox",
+        "Box",
+        "FilledDiamond",
+        "Diamond",
+        "Fork",
+        "StickArrow",
+        "HalfStickArrow",
+        "DoubleStickArrow",
+        "Bar",
+        "UMLInheritance",
+        "SharpArrow",
+        "SharpBackArrow",
+        "SharpBackCross",
+        "CrowsFeet",
+        "CrowBar",
+        "CrowBall",
+        "BarBall",
+        "DoubleBar",
+        "NegativeControls",
+        "DimensionArrow",
+        "EmptyCenterBall",
+        "FilledCenterBall",
+        "UML2Socket",
+        "NonNavigable",
+      ]
+      ,
+      "FilledArrow"
+    )
+
+    inputForm.addField(connectFromInput, 0)
+    inputForm.addField(connectToInput, 1)
+    inputForm.addField(headTypeInput, 2)
+
+    formPrompt = "Add lines to all object with those names"
+    buttonTitle = "connect"
+
+    formObject = await inputForm.show(formPrompt, buttonTitle)
+    connectFrom = formObject.values["connectFrom"]
+    connectTo = formObject.values["connectTo"]
+    headType = formObject.values['headType']
+    console.log(`Get from: ${connectFrom}, to: ${connectTo}.`)
+
+    cnvs = document.windows[0].selection.canvas
+    console.log(`Graphcis length: ${cnvs.graphics.length}`)
+
+    var shapesFrom = new Array()
+    var shapesTo = new Array()
+
+    cnvs.graphics.forEach(function (graphic) {
+      console.log(graphic, graphic.text);
+      if (graphic instanceof Shape && graphic.text === connectFrom) {
+        console.log(graphic.magnets)
+        shapesFrom.push(graphic)
+      }
+      if (graphic instanceof Shape && graphic.text === connectTo) {
+        shapesTo.push(graphic)
+      }
+    })
+
+    console.log(`Found all graphics! from ${shapesFrom.length}, to: ${shapesTo.length}`)
+
+    for (let sf of shapesFrom) {
+      for (let st of shapesTo) {
+        console.log(`draw a line from ${sf.text} to ${st.text}`)
+        let line = cnvs.newLine()
+        line.shadowVector = new Point(0, 0)
+        line.shadowColor = null
+        line.shadowFuzziness = 0
+        line.headType = headType
+
+        line.head = st;
+        line.tail = sf;
+        console.log(line.shadowVector);
+      }
+    }
+
+  });
+
+  action.validate = function (selection, sender) {
+    return true
+  };
+
+  return action;
+})();
