@@ -1,0 +1,43 @@
+/*{
+  "type": "action",
+  "targets": ["omnigraffle"],
+  "author": "laixintao",
+  "identifier": "com.omni-automation.omnigraffle.batch-rename",
+  "version": "1.0",
+  "description": "Batch rename shapes",
+  "label": "batch-rename",
+  "shortLabel": "batch-rename",
+  "paletteLabel": "batch-rename",
+  "image": "info.square.fill"
+}*/
+
+(() => {
+  const action = new PlugIn.Action(async function (selection, sender) {
+    inputForm = new Form()
+    nameInput = new Form.Field.String("nameInput", "Name", null)
+
+    inputForm.addField(nameInput, 1)
+
+    formPrompt = "Rename shapes"
+    buttonTitle = "rename"
+
+    formObject = await inputForm.show(formPrompt, buttonTitle)
+    name = formObject.values["nameInput"]
+    console.log(`input name: ${name}`)
+
+    selectedGraphics = document.windows[0].selection.graphics
+
+    selectedGraphics.forEach(function (graphic) {
+      if (graphic instanceof Shape) {
+        graphic.text = name;
+      }
+    })
+
+  });
+
+  action.validate = function (selection, sender) {
+    return true
+  };
+
+  return action;
+})();
